@@ -1,0 +1,1988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BLAZE BITES — Fire-Grilled Fast Food</title>
+
+  <!-- Favicon / Website Icon (SVG inline data) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='12' fill='%23e63900'/><text y='48' font-size='42' font-family='Arial' text-anchor='middle' x='32'>🔥</text></svg>" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;700&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* ============================================================
+       CSS VARIABLES & RESET
+    ============================================================ */
+    :root {
+      --fire: #e63900;
+      --ember: #ff6b35;
+      --gold: #ffd700;
+      --smoke: #1a1a1a;
+      --ash:   #2c2c2c;
+      --chalk: #f5f0e8;
+      --white: #ffffff;
+      --glass: rgba(255,255,255,0.06);
+      --radius: 12px;
+      --nav-h: 72px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    body {
+      font-family: 'Barlow', sans-serif;
+      background: var(--smoke);
+      color: var(--chalk);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    img { max-width: 100%; display: block; }
+    a  { text-decoration: none; color: inherit; }
+    button { cursor: pointer; border: none; outline: none; }
+
+    /* ============================================================
+       SCROLLBAR
+    ============================================================ */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--ash); }
+    ::-webkit-scrollbar-thumb { background: var(--fire); border-radius: 3px; }
+
+    /* ============================================================
+       NAVIGATION BAR
+    ============================================================ */
+    #navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      height: var(--nav-h);
+      background: rgba(26,26,26,0.95);
+      backdrop-filter: blur(16px);
+      border-bottom: 2px solid var(--fire);
+      display: flex; align-items: center;
+      padding: 0 2rem;
+      gap: 1.5rem;
+    }
+
+    .brand {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem; letter-spacing: 2px;
+      color: var(--gold);
+      flex-shrink: 0;
+    }
+    .brand span { color: var(--fire); }
+
+    /* Nav links */
+    .nav-links {
+      display: flex; gap: 0.25rem; margin-left: 1rem;
+      list-style: none;
+    }
+    .nav-links li button {
+      background: none;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1rem; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #ccc;
+      padding: 0.4rem 0.85rem;
+      border-radius: 6px;
+      transition: color .2s, background .2s;
+      position: relative;
+    }
+    .nav-links li button::after {
+      content: '';
+      position: absolute; left: 50%; bottom: 2px;
+      width: 0; height: 2px;
+      background: var(--fire);
+      transform: translateX(-50%);
+      transition: width .25s;
+      border-radius: 2px;
+    }
+    .nav-links li button:hover,
+    .nav-links li button.active { color: var(--gold); }
+    .nav-links li button:hover::after,
+    .nav-links li button.active::after { width: 70%; }
+
+    /* Search bar */
+    .search-wrap {
+      margin-left: auto;
+      display: flex; align-items: center;
+      background: var(--ash);
+      border: 1px solid #444;
+      border-radius: 30px;
+      padding: 0.35rem 1rem;
+      gap: 0.5rem;
+      transition: border-color .2s;
+    }
+    .search-wrap:focus-within { border-color: var(--fire); }
+    .search-wrap input {
+      background: none; border: none; outline: none;
+      color: var(--chalk); font-family: 'Barlow', sans-serif;
+      font-size: 0.9rem; width: 180px;
+    }
+    .search-wrap input::placeholder { color: #888; }
+    .search-icon { color: #888; font-size: 1rem; }
+    #searchBtn {
+      background: var(--fire);
+      color: #fff;
+      font-size: 0.75rem; font-weight: 700;
+      padding: 0.28rem 0.8rem;
+      border-radius: 20px;
+      transition: background .2s;
+      font-family: 'Barlow Condensed', sans-serif;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    #searchBtn:hover { background: var(--ember); }
+
+    /* ============================================================
+       PAGES CONTAINER
+    ============================================================ */
+    .page {
+      display: none;
+      padding-top: var(--nav-h);
+      min-height: 100vh;
+      animation: fadeIn .35s ease;
+    }
+    .page.active { display: block; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ============================================================
+       PAGE 1 — HOME
+    ============================================================ */
+    .hero {
+      min-height: calc(100vh - var(--nav-h));
+      background:
+        linear-gradient(160deg, rgba(230,57,0,0.55) 0%, rgba(26,26,26,0.95) 60%),
+        url('https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=1400&q=80') center/cover no-repeat;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 4rem 5%;
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 80% 50%, rgba(255,107,53,.18) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1rem; letter-spacing: 6px; text-transform: uppercase;
+      color: var(--ember); margin-bottom: 1rem;
+    }
+    .hero h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3.5rem, 9vw, 7.5rem);
+      line-height: 0.95; letter-spacing: 2px;
+      color: var(--gold);
+    }
+    .hero h1 em { color: var(--white); font-style: normal; display: block; }
+    .hero p {
+      max-width: 440px; margin-top: 1.5rem;
+      font-size: 1.1rem; line-height: 1.7; color: #ccc;
+    }
+    .hero-btns { display: flex; gap: 1rem; margin-top: 2.5rem; flex-wrap: wrap; }
+    .btn-fire {
+      background: linear-gradient(135deg, var(--fire), var(--ember));
+      color: #fff;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.05rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+      padding: 0.85rem 2.2rem; border-radius: 50px;
+      border: none;
+      box-shadow: 0 4px 20px rgba(230,57,0,.45);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .btn-fire:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(230,57,0,.6); }
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--gold);
+      color: var(--gold);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.05rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+      padding: 0.85rem 2.2rem; border-radius: 50px;
+      transition: background .2s, color .2s;
+    }
+    .btn-outline:hover { background: var(--gold); color: var(--smoke); }
+
+    /* Stats strip */
+    .stats-strip {
+      display: flex; flex-wrap: wrap;
+      background: var(--ash);
+      border-top: 3px solid var(--fire);
+    }
+    .stat-item {
+      flex: 1; min-width: 150px;
+      padding: 2rem 1.5rem;
+      text-align: center;
+      border-right: 1px solid #333;
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3rem; color: var(--gold); display: block;
+    }
+    .stat-label { font-size: 0.85rem; color: #999; text-transform: uppercase; letter-spacing: 2px; }
+
+    /* Why us */
+    .section { padding: 5rem 5%; }
+    .section-tag {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.85rem; letter-spacing: 5px; text-transform: uppercase;
+      color: var(--fire); margin-bottom: 0.75rem;
+    }
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 4rem); letter-spacing: 1px;
+      color: var(--white); margin-bottom: 3rem;
+    }
+    .cards-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 1.5rem;
+    }
+    .card {
+      background: var(--ash);
+      border: 1px solid #333;
+      border-radius: var(--radius);
+      padding: 2rem 1.5rem;
+      transition: transform .2s, border-color .2s, box-shadow .2s;
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: var(--fire);
+      box-shadow: 0 12px 35px rgba(230,57,0,.2);
+    }
+    .card-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    .card h3 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.3rem; font-weight: 700; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 0.5rem; letter-spacing: 1px;
+    }
+    .card p { font-size: 0.95rem; color: #aaa; line-height: 1.6; }
+
+    /* ============================================================
+       PAGE 2 — MENU
+    ============================================================ */
+    .page-header {
+      background: linear-gradient(135deg, var(--ash) 0%, var(--smoke) 100%);
+      border-bottom: 2px solid var(--fire);
+      padding: 3.5rem 5% 2.5rem;
+    }
+    .page-header h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.8rem,6vw,5rem); letter-spacing: 2px;
+      color: var(--gold);
+    }
+    .page-header p { color: #aaa; font-size: 1rem; margin-top: 0.5rem; }
+
+    .menu-tabs {
+      display: flex; flex-wrap: wrap; gap: 0.6rem;
+      padding: 2rem 5% 0;
+    }
+    .tab-btn {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.95rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+      padding: 0.5rem 1.4rem;
+      border-radius: 30px;
+      border: 2px solid #444;
+      background: none;
+      color: #ccc;
+      transition: all .2s;
+    }
+    .tab-btn.active, .tab-btn:hover {
+      background: var(--fire); border-color: var(--fire); color: #fff;
+    }
+
+    .menu-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.5rem; padding: 2rem 5% 5rem;
+    }
+    .menu-card {
+      background: var(--ash); border-radius: var(--radius);
+      overflow: hidden; border: 1px solid #333;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .menu-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 14px 40px rgba(0,0,0,.5);
+    }
+    .menu-card-img {
+      height: 180px; overflow: hidden; position: relative;
+    }
+    .menu-card-img img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform .4s;
+    }
+    .menu-card:hover .menu-card-img img { transform: scale(1.08); }
+    .badge {
+      position: absolute; top: 12px; left: 12px;
+      background: var(--fire); color: #fff;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.78rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+      padding: 0.2rem 0.65rem; border-radius: 20px;
+    }
+    .menu-card-body { padding: 1.25rem 1.25rem 1.5rem; }
+    .menu-card-body h3 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.2rem; font-weight: 700; color: var(--white);
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .menu-card-body p { font-size: 0.88rem; color: #888; margin-top: 0.4rem; line-height: 1.5; }
+    .menu-card-footer {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 1rem;
+    }
+    .price {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.45rem; font-weight: 700; color: var(--gold);
+    }
+    .add-btn {
+      background: var(--fire); color: #fff;
+      font-size: 0.85rem; font-weight: 700;
+      padding: 0.4rem 1rem; border-radius: 20px;
+      font-family: 'Barlow Condensed', sans-serif;
+      letter-spacing: 1px; text-transform: uppercase;
+      transition: background .2s;
+    }
+    .add-btn:hover { background: var(--ember); }
+
+    /* ============================================================
+       PAGE 3 — ABOUT
+    ============================================================ */
+    .about-hero {
+      padding: 4rem 5%;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 4rem; align-items: center;
+    }
+    @media (max-width: 768px) { .about-hero { grid-template-columns: 1fr; } }
+    .about-text .section-title { margin-bottom: 1.5rem; }
+    .about-text p { color: #aaa; line-height: 1.8; margin-bottom: 1.2rem; }
+    .about-img-wrap {
+      position: relative; border-radius: var(--radius); overflow: hidden;
+      border: 3px solid var(--fire);
+    }
+    .about-img-wrap img { width: 100%; height: 400px; object-fit: cover; }
+    .about-img-wrap::after {
+      content: '🔥';
+      position: absolute; bottom: 20px; right: 20px;
+      font-size: 3rem;
+      filter: drop-shadow(0 0 12px rgba(255,107,53,.8));
+    }
+
+    .team-grid {
+      padding: 2rem 5% 5rem;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 1.5rem;
+    }
+    .team-card {
+      background: var(--ash); border-radius: var(--radius);
+      text-align: center; padding: 2rem 1.5rem;
+      border: 1px solid #333;
+      transition: border-color .2s, transform .2s;
+    }
+    .team-card:hover { border-color: var(--fire); transform: translateY(-5px); }
+    .team-avatar {
+      width: 88px; height: 88px; border-radius: 50%;
+      margin: 0 auto 1rem;
+      border: 3px solid var(--fire); overflow: hidden;
+      font-size: 3.2rem; display: flex; align-items: center; justify-content: center;
+      background: var(--smoke);
+    }
+    .team-card h4 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.15rem; font-weight: 700; text-transform: uppercase;
+      color: var(--gold); letter-spacing: 1px;
+    }
+    .team-card span { font-size: 0.85rem; color: var(--fire); display: block; margin-top: 0.3rem; }
+
+    /* timeline */
+    .timeline { padding: 0 5% 4rem; }
+    .timeline-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.5rem; color: var(--gold); margin-bottom: 2rem; letter-spacing: 1px;
+    }
+    .tl-item { display: flex; gap: 2rem; margin-bottom: 1.5rem; align-items: flex-start; }
+    .tl-year {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem; color: var(--fire); min-width: 72px;
+    }
+    .tl-dot { width: 14px; height: 14px; border-radius: 50%; background: var(--fire); margin-top: 10px; flex-shrink: 0; }
+    .tl-line { width: 2px; background: #333; flex-shrink: 0; }
+    .tl-body h4 { font-family: 'Barlow Condensed', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--white); text-transform: uppercase; letter-spacing: 0.5px; }
+    .tl-body p { font-size: 0.9rem; color: #888; margin-top: 0.3rem; line-height: 1.5; }
+
+    /* ============================================================
+       PAGE 4 — ORDER
+    ============================================================ */
+    .order-wrap {
+      padding: 3rem 5%;
+      display: grid; grid-template-columns: 1.2fr 0.8fr;
+      gap: 3rem; max-width: 1100px; margin: 0 auto;
+    }
+    @media (max-width: 768px) { .order-wrap { grid-template-columns: 1fr; } }
+    .order-form-box {
+      background: var(--ash); border-radius: 16px;
+      border: 1px solid #333; padding: 2.5rem;
+    }
+    .order-form-box h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.2rem; color: var(--gold); margin-bottom: 2rem; letter-spacing: 1px;
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } }
+    .form-group { margin-bottom: 1.3rem; }
+    .form-group label {
+      display: block; font-size: 0.82rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; color: #888; margin-bottom: 0.4rem;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      background: var(--smoke); border: 1.5px solid #444;
+      border-radius: 8px; color: var(--chalk);
+      font-family: 'Barlow', sans-serif; font-size: 0.95rem;
+      padding: 0.7rem 1rem;
+      transition: border-color .2s;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { outline: none; border-color: var(--fire); }
+    .form-group textarea { resize: vertical; min-height: 90px; }
+    .form-group select option { background: var(--ash); }
+    .submit-btn {
+      width: 100%; padding: 1rem;
+      background: linear-gradient(135deg, var(--fire), var(--ember));
+      color: #fff; font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem; letter-spacing: 2px;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(230,57,0,.35);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(230,57,0,.55); }
+
+    .order-summary {
+      background: var(--ash); border-radius: 16px;
+      border: 1px solid #333; padding: 2rem;
+      align-self: flex-start; position: sticky; top: calc(var(--nav-h) + 1.5rem);
+    }
+    .order-summary h3 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem; color: var(--gold); margin-bottom: 1.5rem; letter-spacing: 1px;
+    }
+    .summary-item {
+      display: flex; justify-content: space-between;
+      padding: 0.75rem 0; border-bottom: 1px solid #333; font-size: 0.95rem;
+    }
+    .summary-item:last-of-type { border-bottom: none; }
+    .summary-total {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 1.5rem; padding-top: 1rem; border-top: 2px solid var(--fire);
+    }
+    .summary-total span:first-child { font-family: 'Barlow Condensed', sans-serif; font-size: 1.1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #ccc; }
+    .total-price { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: var(--gold); }
+
+    /* ============================================================
+       PAGE 5 — CONTACT
+    ============================================================ */
+    .contact-grid {
+      padding: 3rem 5%;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+    }
+    @media (max-width: 768px) { .contact-grid { grid-template-columns: 1fr; } }
+    .contact-info h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3rem; color: var(--gold); letter-spacing: 1px; margin-bottom: 0.5rem;
+    }
+    .contact-info p { color: #aaa; line-height: 1.8; margin-bottom: 2rem; }
+    .contact-detail {
+      display: flex; gap: 1rem; align-items: flex-start;
+      margin-bottom: 1.5rem;
+    }
+    .detail-icon {
+      font-size: 1.6rem;
+      background: var(--ash); border: 1px solid #444;
+      border-radius: 10px; padding: 0.6rem 0.75rem;
+      flex-shrink: 0;
+    }
+    .detail-text strong {
+      display: block; font-size: 0.8rem; text-transform: uppercase;
+      letter-spacing: 1.5px; color: var(--fire); margin-bottom: 0.2rem;
+    }
+    .detail-text span { font-size: 0.95rem; color: #ccc; }
+
+    .contact-form-box {
+      background: var(--ash); border-radius: 16px;
+      border: 1px solid #333; padding: 2.5rem;
+    }
+    .contact-form-box h3 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem; color: var(--gold); margin-bottom: 1.5rem; letter-spacing: 1px;
+    }
+
+    /* Hours table */
+    .hours-table { margin: 2rem 0; }
+    .hours-table h4 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.1rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 2px; color: var(--ember); margin-bottom: 1rem;
+    }
+    .hours-row {
+      display: flex; justify-content: space-between;
+      padding: 0.6rem 0; border-bottom: 1px solid #333;
+      font-size: 0.92rem;
+    }
+    .hours-row:last-child { border-bottom: none; }
+    .hours-row span:first-child { color: #aaa; }
+    .hours-row span:last-child { color: var(--gold); font-weight: 600; }
+<!-- ===================== CSS (PASTE IN STYLE TAG) ===================== -->
+.admin-card{
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,107,53,0.25);
+  border-radius:16px;
+  padding:1.2rem;
+  backdrop-filter:blur(12px);
+  box-shadow:0 0 25px rgba(0,0,0,0.4);
+  transition:0.3s;
+}
+
+.admin-card:hover{
+  transform:translateY(-6px);
+  border-color:#ff6b35;
+  box-shadow:0 0 25px rgba(230,57,0,0.5);
+}
+
+.admin-card h3{
+  color:#ff6b35;
+  margin-bottom:0.8rem;
+  font-size:1rem;
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+
+.admin-card input{
+  width:100%;
+  padding:0.6rem;
+  margin:5px 0;
+  border-radius:8px;
+  border:1px solid #333;
+  background:#000;
+  color:#fff;
+  outline:none;
+  transition:0.2s;
+}
+
+.admin-card input:focus{
+  border-color:#ff6b35;
+  box-shadow:0 0 10px rgba(255,107,53,0.3);
+}
+
+.admin-card button{
+  width:100%;
+  padding:0.6rem;
+  margin-top:0.5rem;
+  background:linear-gradient(135deg,#e63900,#ff6b35);
+  border:none;
+  border-radius:8px;
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.admin-card button:hover{
+  transform:scale(1.03);
+}
+
+    /* ============================================================
+       SEARCH RESULTS OVERLAY
+    ============================================================ */
+    #searchResults {
+      display: none;
+      position: fixed; top: var(--nav-h); left: 0; right: 0; z-index: 900;
+      background: rgba(26,26,26,.98);
+      padding: 2rem 5%; max-height: calc(100vh - var(--nav-h));
+      overflow-y: auto; border-top: 2px solid var(--fire);
+      animation: fadeIn .25s ease;
+    }
+    #searchResults h3 {
+      font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem;
+      color: var(--fire); margin-bottom: 1rem; letter-spacing: 1px;
+    }
+    .search-result-item {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 0.9rem 1.2rem; border-radius: 10px;
+      background: var(--ash); margin-bottom: 0.75rem;
+      border: 1px solid #333;
+      cursor: pointer; transition: border-color .2s;
+    }
+    .search-result-item:hover { border-color: var(--fire); }
+    .search-result-item .r-icon { font-size: 1.5rem; }
+    .search-result-item strong { color: var(--gold); display: block; font-family: 'Barlow Condensed', sans-serif; font-size: 1.05rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .search-result-item small { color: #888; font-size: 0.85rem; }
+    #closeSearch {
+      display: block; width: 100%; padding: 0.7rem;
+      background: none; border: 1px solid #444; border-radius: 8px;
+      color: #888; font-family: 'Barlow', sans-serif; font-size: 0.9rem;
+      margin-top: 1rem;
+      transition: border-color .2s, color .2s;
+    }
+    #closeSearch:hover { border-color: var(--fire); color: var(--chalk); }
+
+    /* ============================================================
+       PAGE-UP & PAGE-DOWN BUTTONS
+    ============================================================ */
+    .scroll-btns {
+      position: fixed; right: 1.5rem; bottom: 2rem;
+      z-index: 800; display: flex; flex-direction: column; gap: 0.5rem;
+    }
+    .scroll-btn {
+      width: 46px; height: 46px;
+      background: var(--fire); color: #fff;
+      border-radius: 50%;
+      font-size: 1.3rem; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 16px rgba(230,57,0,.4);
+      transition: background .2s, transform .15s;
+    }
+    .scroll-btn:hover { background: var(--ember); transform: scale(1.1); }
+    .scroll-btn.up::before  { content: '▲'; }
+    .scroll-btn.down::before{ content: '▼'; }
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    footer {
+      background: #111; border-top: 2px solid var(--fire);
+      padding: 3rem 5% 2rem;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+    }
+    .footer-brand { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: var(--gold); letter-spacing: 2px; }
+    .footer-brand span { color: var(--fire); }
+    .footer-brand p { font-family: 'Barlow', sans-serif; font-size: 0.88rem; color: #666; margin-top: 0.5rem; font-weight: 400; letter-spacing: 0; }
+    .footer-col h5 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.85rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 2px; color: var(--fire); margin-bottom: 1rem;
+    }
+    .footer-col ul { list-style: none; }
+    .footer-col ul li { margin-bottom: 0.5rem; }
+    .footer-col ul li button {
+      background: none; color: #777; font-family: 'Barlow', sans-serif;
+      font-size: 0.9rem; transition: color .2s;
+    }
+    .footer-col ul li button:hover { color: var(--gold); }
+    .footer-bottom {
+      grid-column: 1 / -1;
+      padding-top: 1.5rem; margin-top: 0.5rem;
+      border-top: 1px solid #222;
+      text-align: center; font-size: 0.82rem; color: #555;
+    }
+    .footer-bottom strong { color: var(--fire); }
+
+    /* NOTIFICATION TOAST */
+    #toast {
+      position: fixed; bottom: 5.5rem; right: 1.5rem; z-index: 1500;
+      background: var(--ash); border: 1px solid var(--fire);
+      border-radius: 10px; padding: 0.8rem 1.2rem;
+      color: var(--chalk); font-size: 0.9rem;
+      box-shadow: 0 6px 25px rgba(0,0,0,.5);
+      transform: translateX(150%); transition: transform .3s;
+      max-width: 220px;
+    }
+    #toast.show { transform: translateX(0); }
+
+    /* No-result */
+    .no-result {
+      text-align: center; padding: 2rem;
+      color: #666; font-size: 1rem;
+    }
+</style>
+</head>
+<body>
+<!-- ===================== LOGIN PAGE ===================== -->
+<div id="loginPage" style="
+  position:fixed;
+  inset:0;
+  background:linear-gradient(135deg,#0f0f0f,#000);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:5000;
+">
+
+  <div style="
+    width:350px;
+    background:#1f1f1f;
+    padding:2.5rem;
+    border-radius:15px;
+    border:1px solid #333;
+    box-shadow:0 10px 40px rgba(0,0,0,.8);
+    text-align:center;
+  ">
+
+    <h2 style="
+      font-family:'Bebas Neue';
+      font-size:2.2rem;
+      color:#ffd700;
+      margin-bottom:1rem;
+    ">🔥 BLAZE LOGIN</h2>
+
+    <p style="color:#888;font-size:0.9rem;margin-bottom:1.5rem">
+      Login to continue
+    </p>
+
+    <input id="username" type="text" placeholder="Enter Name"
+      style="width:100%;padding:0.7rem;margin-bottom:1rem;
+      border-radius:8px;border:1px solid #444;background:#000;color:#fff"/>
+
+    <input id="password" type="password" placeholder="Enter Password"
+      style="width:100%;padding:0.7rem;margin-bottom:1.2rem;
+      border-radius:8px;border:1px solid #444;background:#000;color:#fff"/>
+   
+    <button onclick="loginUser()" style="
+      width:100%;
+      padding:0.8rem;
+      background:linear-gradient(135deg,#e63900,#ff6b35);
+      border:none;
+      color:#fff;
+      font-weight:bold;
+      border-radius:8px;
+      font-size:1rem;
+      cursor:pointer;
+    ">LOGIN</button>
+
+    <p id="loginError" style="color:red;margin-top:1rem;font-size:0.85rem"></p>
+
+  </div>
+</div>
+
+<!-- ===================== NAVBAR ===================== -->
+<nav id="navbar">
+  <div class="brand">🔥 BLAZE<span>BITES</span></div>
+  <ul class="nav-links">
+   <ul class="nav-links">
+  <li><button onclick="showPage('home')" id="nav-home" class="active">Home</button></li>
+  <li><button onclick="showPage('menu')" id="nav-menu">Menu</button></li>
+  <li><button onclick="showPage('about')" id="nav-about">About</button></li>
+  <li><button onclick="showPage('order')" id="nav-order">Order</button></li>
+  <li><button onclick="showPage('contact')" id="nav-contact">Contact</button></li>
+
+  <!-- ✅ FIXED BUTTONS -->
+  <li><button onclick="logoutUser()">Logout</button></li>
+</ul>
+</button>
+  </ul>
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="searchInput" placeholder="Search menu, pages…" oninput="handleSearch()" onkeydown="if(event.key==='Enter')handleSearch()"/>
+    <button id="searchBtn" onclick="handleSearch()">Go</button>
+  </div>
+</nav>
+
+<!-- ===================== SEARCH RESULTS ===================== -->
+<div id="searchResults">
+  <h3>Search Results</h3>
+  <div id="searchList"></div>
+  <button id="closeSearch" onclick="closeSearch()">✕ Close</button>
+</div>
+
+<!-- ===================== PAGE 1: HOME ===================== -->
+<section class="page active" id="page-home">
+  <div class="hero">
+    <p class="hero-eyebrow">🔥 Pakistan's Hottest Fast Food Brand</p>
+    <h1>FIRE IN <em>EVERY BITE</em></h1>
+    <p>Authentic flame-grilled burgers, crispy loaded fries, juicy wraps & bold shakes — crafted to ignite your taste buds every single time.</p>
+    <div class="hero-btns">
+      <button class="btn-fire" onclick="showPage('menu')">Explore Menu 🍔</button>
+      <button class="btn-outline" onclick="showPage('order')">Order Now →</button>
+    </div>
+  </div>
+
+  <div class="stats-strip">
+    <div class="stat-item"><span class="stat-num">12+</span><span class="stat-label">Branches</span></div>
+    <div class="stat-item"><span class="stat-num">50K</span><span class="stat-label">Happy Customers</span></div>
+    <div class="stat-item"><span class="stat-num">80+</span><span class="stat-label">Menu Items</span></div>
+    <div class="stat-item"><span class="stat-num">4.9 ⭐</span><span class="stat-label">Average Rating</span></div>
+  </div>
+
+  <div class="section">
+    <p class="section-tag">Why Choose Us</p>
+    <h2 class="section-title">THE BLAZE DIFFERENCE</h2>
+    <div class="cards-grid">
+      <div class="card"><div class="card-icon">🔥</div><h3>Fire-Grilled Fresh</h3><p>Every burger & tikka is flame-grilled to order — never microwaved, never frozen.</p></div>
+      <div class="card"><div class="card-icon">⚡</div><h3>Lightning Delivery</h3><p>Hot food at your door in under 30 minutes. We track every order in real time.</p></div>
+      <div class="card"><div class="card-icon">🌶️</div><h3>Bold Flavors</h3><p>Our signature Blaze sauce is a secret recipe perfected over 10 years. Addictive guaranteed.</p></div>
+      <div class="card"><div class="card-icon">🥗</div><h3>Fresh Ingredients</h3><p>Locally sourced vegetables, halal meats, and zero artificial preservatives. Always.</p></div>
+      <div class="card"><div class="card-icon">💸</div><h3>Unbeatable Value</h3><p>Premium taste at student-friendly prices. Deals & combos starting from Rs. 299 only.</p></div>
+      <div class="card"><div class="card-icon">📱</div><h3>Easy Ordering</h3><p>Order in seconds from our website, WhatsApp, or walk into any of our 12 branches.</p></div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-brand">🔥 BLAZE<span>BITES</span><p>Fire-Grilled Fast Food Since 2014</p></div>
+    <div class="footer-col"><h5>Pages</h5><ul>
+      <li><button onclick="showPage('home')">Home</button></li>
+      <li><button onclick="showPage('menu')">Menu</button></li>
+      <li><button onclick="showPage('about')">About Us</button></li>
+      <li><button onclick="showPage('order')">Order Now</button></li>
+      <li><button onclick="showPage('contact')">Contact</button></li>
+    </ul></div>
+    <div class="footer-col"><h5>Popular</h5><ul>
+      <li><button onclick="showPage('menu')">Blaze Burger</button></li>
+      <li><button onclick="showPage('menu')">Fire Fries</button></li>
+      <li><button onclick="showPage('menu')">Lava Wings</button></li>
+      <li><button onclick="showPage('menu')">Inferno Wrap</button></li>
+    </ul></div>
+    <div class="footer-col"><h5>Contact</h5><ul>
+      <li><button>📞 0300-BLAZE01</button></li>
+      <li><button>📧 info@blazebites.pk</button></li>
+      <li><button>📍 Main Branch, Lahore</button></li>
+    </ul></div>
+    <div class="footer-bottom">© 2025 <strong>BlazeBites Pvt. Ltd.</strong> — All Rights Reserved. Designed with 🔥</div>
+  </footer>
+</section>
+
+<!-- ===================== PAGE 2: MENU ===================== -->
+<section class="page" id="page-menu">
+  <div class="page-header">
+    <h2>🍔 Our Blazing Menu</h2>
+    <p>Flame-grilled flavors crafted to perfection — pick your poison.</p>
+  </div>
+
+  <div class="menu-tabs">
+    <button class="tab-btn active" onclick="filterMenu('all',this)">All Items</button>
+    <button class="tab-btn" onclick="filterMenu('burger',this)">Burgers</button>
+    <button class="tab-btn" onclick="filterMenu('fries',this)">Fries & Sides</button>
+    <button class="tab-btn" onclick="filterMenu('wrap',this)">Wraps</button>
+    <button class="tab-btn" onclick="filterMenu('wings',this)">Wings</button>
+    <button class="tab-btn" onclick="filterMenu('drinks',this)">Drinks</button>
+    <button class="tab-btn" onclick="filterMenu('dessert',this)">Desserts</button>
+  </div>
+
+  <div class="menu-grid" id="menuGrid"></div>
+
+  <footer>
+    <div class="footer-brand">🔥 BLAZE<span>BITES</span><p>Fire-Grilled Fast Food Since 2014</p></div>
+    <div class="footer-col"><h5>Quick Order</h5><ul>
+      <li><button onclick="showPage('order')">Order Online</button></li>
+      <li><button onclick="showPage('contact')">Find a Branch</button></li>
+    </ul></div>
+    <div class="footer-bottom">© 2025 <strong>BlazeBites Pvt. Ltd.</strong> — All Rights Reserved.</div>
+  </footer>
+</section>
+
+<!-- ===================== PAGE 3: ABOUT ===================== -->
+<section class="page" id="page-about">
+  <div class="page-header">
+    <h2>🔥 About BlazeBites</h2>
+    <p>Born from a passion for bold flavors and authentic grilling.</p>
+  </div>
+
+  <div class="about-hero">
+    <div class="about-text">
+      <p class="section-tag">Our Story</p>
+      <h2 class="section-title">WHERE FIRE MEETS FLAVOR</h2>
+      <p>BlazeBites started in 2014 with one small grill stall in Lahore's food street. Our founder Chef Usman Zafar had one dream — to create fast food that actually tastes like it was made with love, not just speed.</p>
+      <p>Ten years later, we have 12 branches across Pakistan, a loyal customer base of 50,000+ food lovers, and a menu that keeps growing — but our original flame-grilled recipe has never changed.</p>
+      <p>We believe fast food doesn't have to mean boring food. Every item is handcrafted, every sauce is homemade, and every bite is built to make you come back.</p>
+      <button class="btn-fire" style="margin-top:1rem" onclick="showPage('menu')">See Our Menu 🍔</button>
+    </div>
+    <div class="about-img-wrap">
+      <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=700&q=80" alt="Our Signature Burger"/>
+    </div>
+  </div>
+
+  <div style="padding: 0 5%;">
+    <p class="section-tag">Our Journey</p>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-year">2014</div>
+        <div>
+          <div class="tl-body"><h4>The First Flame</h4><p>Chef Usman opens the first BlazeBites stall at Lahore Food Street with just 5 items on the menu.</p></div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2016</div>
+        <div><div class="tl-body"><h4>First Restaurant Branch</h4><p>Opens first dine-in restaurant in Gulberg, Lahore. Wins "Best Burger" at Punjab Food Festival.</p></div></div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2019</div>
+        <div><div class="tl-body"><h4>National Expansion</h4><p>Expands to Karachi, Islamabad, and Faisalabad. Launches the famous Blaze Sauce in bottles.</p></div></div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2022</div>
+        <div><div class="tl-body"><h4>Online Ordering Launch</h4><p>Introduces website ordering and WhatsApp delivery. 10,000 orders in first month!</p></div></div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2025</div>
+        <div><div class="tl-body"><h4>50K Family Milestone</h4><p>50,000 loyal customers and 12 branches. New items launching every quarter.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="padding-top:0">
+    <p class="section-tag">Meet The Team</p>
+    <h2 class="section-title">THE FIRE CREW</h2>
+    <div class="team-grid">
+      <div class="team-card"><div class="team-avatar">👨‍🍳</div><h4>Chef Usman Zafar</h4><span>Founder & Head Chef</span></div>
+      <div class="team-card"><div class="team-avatar">👩‍💼</div><h4>Amna Shahid</h4><span>Operations Manager</span></div>
+      <div class="team-card"><div class="team-avatar">👨‍🔬</div><h4>Bilal Hussain</h4><span>Recipe Developer</span></div>
+      <div class="team-card"><div class="team-avatar">👩‍🎨</div><h4>Sara Malik</h4><span>Brand & Marketing</span></div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-brand">🔥 BLAZE<span>BITES</span><p>Fire-Grilled Fast Food Since 2014</p></div>
+    <div class="footer-col"><h5>Explore</h5><ul>
+      <li><button onclick="showPage('menu')">Our Menu</button></li>
+      <li><button onclick="showPage('order')">Order Now</button></li>
+      <li><button onclick="showPage('contact')">Contact</button></li>
+    </ul></div>
+    <div class="footer-bottom">© 2025 <strong>BlazeBites Pvt. Ltd.</strong> — All Rights Reserved.</div>
+  </footer>
+</section>
+
+<!-- ===================== PAGE 4: ORDER ===================== -->
+<section class="page" id="page-order">
+  <div class="page-header">
+    <h2>🛒 Order Online</h2>
+    <p>Hot food delivered to your door in under 30 minutes. All areas across Pakistan.</p>
+  </div>
+
+  <div class="order-wrap">
+    <div class="order-form-box">
+      <h2>Place Your Order</h2>
+      <div class="form-row">
+        <div class="form-group"><label>Your Name</label><input type="text" placeholder="e.g. Ali Khan"/></div>
+        <div class="form-group"><label>Phone Number</label><input type="tel" placeholder="0300-1234567"/></div>
+      </div>
+      <div class="form-group"><label>Delivery Address</label><input type="text" placeholder="Street, Area, City…"/></div>
+      <div class="form-group"><label>Choose Item</label>
+        <select>
+          <option>Blaze Double Burger — Rs. 699</option>
+          <option>Inferno Wrap — Rs. 549</option>
+          <option>Lava Wings (8 pcs) — Rs. 799</option>
+          <option>Fire Fries Large — Rs. 299</option>
+          <option>Volcano Shake — Rs. 349</option>
+          <option>Custom Combo — Ask on WhatsApp</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Quantity</label><input type="number" placeholder="1" min="1" max="20"/></div>
+        <div class="form-group"><label>Spice Level</label>
+          <select>
+            <option>Mild 🟢</option><option>Medium 🟡</option>
+            <option>Hot 🔴</option><option>EXTRA BLAZE 🔥</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label>Special Instructions</label><textarea placeholder="Any special requests? Extra sauce, no onions, etc."></textarea></div>
+      <div class="form-group"><label>Payment Method</label>
+        <select>
+          <option>Cash on Delivery</option>
+          <option>Easypaisa</option><option>JazzCash</option>
+          <option>Bank Transfer</option>
+        </select>
+      </div>
+      <button class="submit-btn" onclick="placeOrder()">🔥 PLACE ORDER NOW</button>
+    </div>
+
+    <div class="order-summary">
+      <h3>Order Summary</h3>
+      <div class="summary-item"><span>Blaze Double Burger ×1</span><span style="color:var(--gold)">Rs. 699</span></div>
+      <div class="summary-item"><span>Delivery Fee</span><span style="color:var(--gold)">Rs. 99</span></div>
+      <div class="summary-item"><span>Discount (5%)</span><span style="color:#4caf50">- Rs. 35</span></div>
+      <div class="summary-total">
+        <span>Total Payable</span>
+        <span class="total-price">Rs. 763</span>
+      </div>
+      <p style="font-size:.82rem;color:#666;margin-top:1.2rem;line-height:1.6">⏱ Estimated delivery: <strong style="color:var(--ember)">25–35 minutes</strong> after order confirmation.</p>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-brand">🔥 BLAZE<span>BITES</span><p>Fire-Grilled Fast Food Since 2014</p></div>
+    <div class="footer-col"><h5>Help</h5><ul>
+      <li><button onclick="showPage('contact')">Track Order</button></li>
+      <li><button onclick="showPage('contact')">Cancel Order</button></li>
+    </ul></div>
+    <div class="footer-bottom">© 2025 <strong>BlazeBites Pvt. Ltd.</strong> — All Rights Reserved.</div>
+  </footer>
+</section>
+<!-- ===== SIMPLE ORDER CONFIRM POPUP ===== -->
+
+<div id="receiptPopup" style="
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.7);
+display:none;
+align-items:center;
+justify-content:center;
+z-index:9999;
+">
+
+  <div style="
+  width:320px;
+  background:#111;
+  padding:2rem;
+  border-radius:18px;
+  text-align:center;
+  border:1px solid #333;
+  box-shadow:0 0 40px rgba(0,0,0,.7);
+  animation:popupShow .3s ease;
+  ">
+
+    <div style="
+    width:80px;
+    height:80px;
+    margin:auto;
+    border-radius:50%;
+    background:linear-gradient(135deg,#00c853,#00e676);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:2.5rem;
+    color:#fff;
+    margin-bottom:1rem;
+    ">
+      ✓
+    </div>
+
+    <h2 style="
+    color:#fff;
+    margin-bottom:.5rem;
+    ">
+    Order Confirmed
+    </h2>
+
+    <p style="
+    color:#aaa;
+    line-height:1.6;
+    font-size:.95rem;
+    ">
+    Your order has been placed successfully 🔥
+    </p>
+
+    <button onclick="closeReceipt()" style="
+    margin-top:1.4rem;
+    width:100%;
+    padding:.9rem;
+    border:none;
+    border-radius:12px;
+    background:linear-gradient(135deg,#ff4d00,#ff8800);
+    color:#fff;
+    font-weight:bold;
+    cursor:pointer;
+    ">
+    OKAY
+    </button>
+
+  </div>
+</div>
+
+<style>
+@keyframes popupShow{
+from{
+transform:scale(.7);
+opacity:0;
+}
+to{
+transform:scale(1);
+opacity:1;
+}
+</style>
+
+<!-- ===================== PAGE 5: CONTACT ===================== -->
+<section class="page" id="page-contact">
+  <div class="page-header">
+    <h2>📞 Contact Us</h2>
+    <p>We'd love to hear from you — orders, feedback, or just to say hello!</p>
+  </div>
+
+  <div class="contact-grid">
+    <div class="contact-info">
+      <h2>GET IN TOUCH</h2>
+      <p>Have questions, complaints, or suggestions? Our team is available 7 days a week to help you.</p>
+      <div class="contact-detail">
+        <div class="detail-icon">📞</div>
+        <div class="detail-text"><strong>Phone</strong><span>0300-BLAZE01 (0300-2529301)</span></div>
+      </div>
+      <div class="contact-detail">
+        <div class="detail-icon">📧</div>
+        <div class="detail-text"><strong>Email</strong><span>info@blazebites.pk</span></div>
+      </div>
+      <div class="contact-detail">
+        <div class="detail-icon">💬</div>
+        <div class="detail-text"><strong>WhatsApp</strong><span>0311-BLAZE01 (for quick orders)</span></div>
+      </div>
+      <div class="contact-detail">
+        <div class="detail-icon">📍</div>
+        <div class="detail-text"><strong>Main Branch</strong><span>Shop 12, MM Alam Road, Gulberg III, Lahore</span></div>
+      </div>
+      <div class="hours-table">
+        <h4>⏰ Opening Hours</h4>
+        <div class="hours-row"><span>Monday – Thursday</span><span>11:00 AM – 1:00 AM</span></div>
+        <div class="hours-row"><span>Friday – Saturday</span><span>11:00 AM – 2:00 AM</span></div>
+        <div class="hours-row"><span>Sunday</span><span>12:00 PM – 1:00 AM</span></div>
+      </div>
+    </div>
+
+    <div class="contact-form-box">
+      <h3>Send Us a Message</h3>
+      <div class="form-group"><label>Your Name</label><input type="text" placeholder="e.g. Sara Ahmed"/></div>
+      <div class="form-group"><label>Email Address</label><input type="email" placeholder="your@email.com"/></div>
+      <div class="form-group"><label>Subject</label>
+        <select>
+          <option>General Enquiry</option>
+          <option>Order Complaint</option>
+          <option>Feedback / Suggestion</option>
+          <option>Partnership / Franchise</option>
+          <option>Media / Press</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Your Message</label><textarea placeholder="Type your message here…" style="min-height:130px"></textarea></div>
+      <button class="submit-btn" onclick="sendMsg()">📤 SEND MESSAGE</button>
+    </div>
+  </div>
+
+  <!-- Map placeholder -->
+  <div style="padding: 0 5% 4rem">
+    <div style="background:var(--ash);border:1px solid #333;border-radius:16px;height:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;border-top:3px solid var(--fire)">
+      <span style="font-size:3rem">📍</span>
+      <p style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--gold);letter-spacing:1px">FIND US ON MAP</p>
+      <p style="color:#777;font-size:0.9rem">MM Alam Road, Gulberg III, Lahore — near Gloria Jeans</p>
+      <button class="btn-fire" style="font-size:0.9rem;padding:0.6rem 1.5rem" onclick="alert('Map feature coming soon! Please use Google Maps: BlazeBites Lahore')">Open in Google Maps</button>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-brand">🔥 BLAZE<span>BITES</span><p>Fire-Grilled Fast Food Since 2014</p></div>
+    <div class="footer-col"><h5>Quick Links</h5><ul>
+      <li><button onclick="showPage('home')">Home</button></li>
+      <li><button onclick="showPage('menu')">Menu</button></li>
+      <li><button onclick="showPage('order')">Order Now</button></li>
+    </ul></div>
+    <div class="footer-bottom">© 2025 <strong>BlazeBites Pvt. Ltd.</strong> — All Rights Reserved.</div>
+  </footer>
+</section>
+
+
+</div>
+
+<!-- ===================== SCROLL BUTTONS ===================== -->
+<div class="scroll-btns">
+  <button class="scroll-btn up"   title="Page Up"   onclick="scrollUp()"></button>
+  <button class="scroll-btn down" title="Page Down" onclick="scrollDown()"></button>
+</div>
+
+<!-- ===================== TOAST ===================== -->
+<div id="toast"></div>
+
+<!-- ===================== JAVASCRIPT ===================== -->
+<script>
+
+  let cart = [];
+
+  let menuItems = [];
+
+
+
+  // Hardcoded items (fallback - agar backend se data nahi aaya to ye dikhenge)
+
+  const hardcodedItems = [
+
+    { name: "Blaze Double Burger", cat: "burger", price: 699, desc: "Double flame-grilled patty, cheddar, Blaze sauce, lettuce & tomato in a brioche bun.", badge: "Best Seller", img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&q=75", discount: 0 },
+
+    { name: "Classic Smash Burger", cat: "burger", price: 549, desc: "Smashed single patty, American cheese, caramelized onions & pickles.", badge: "", img: "https://images.unsplash.com/photo-1550547660-d9450f859349?w=400&q=75", discount: 0 },
+
+    { name: "Zinger Stack", cat: "burger", price: 599, desc: "Crispy fried chicken fillet, coleslaw, jalapeños & fire mayo.", badge: "🌶️ Spicy", img: "https://images.unsplash.com/photo-1606755962773-d324e0a13086?w=400&q=75", discount: 0 },
+
+    { name: "Mushroom Melt", cat: "burger", price: 629, desc: "Grilled patty with sautéed mushrooms, Swiss cheese & truffle aioli.", badge: "New", img: "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=400&q=75", discount: 0 },
+
+    { name: "Fire Fries Large", cat: "fries", price: 299, desc: "Thick-cut fries tossed in Blaze seasoning — smoky, spicy & addictive.", badge: "Fan Fav", img: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&q=75", discount: 0 },
+
+    { name: "Loaded Cheese Fries", cat: "fries", price: 399, desc: "Crispy fries smothered in nacho cheese sauce & jalapeños.", badge: "", img: "https://images.unsplash.com/photo-1541592106381-b31e9677c0e5?w=400&q=75", discount: 0 },
+
+    { name: "Onion Rings Basket", cat: "fries", price: 249, desc: "Golden-fried onion rings served with garlic dip.", badge: "", img: "https://images.unsplash.com/photo-1639024471283-03518883512d?w=400&q=75", discount: 0 },
+
+    { name: "Inferno Wrap", cat: "wrap", price: 549, desc: "Flame-grilled chicken strips, grilled veggies & Blaze sauce in a toasted tortilla.", badge: "🔥 Hot", img: "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?w=400&q=75", discount: 0 },
+
+    { name: "BBQ Beef Wrap", cat: "wrap", price: 599, desc: "Pulled beef, BBQ sauce, pickled onions & crispy slaw in a whole-wheat wrap.", badge: "", img: "https://images.unsplash.com/photo-1600891964092-4316c288032e?w=400&q=75", discount: 0 },
+
+    { name: "Lava Wings 8 pcs", cat: "wings", price: 799, desc: "Crispy wings tossed in our signature lava sauce. Sweet heat perfection.", badge: "🔥 Must Try", img: "https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=400&q=75", discount: 0 },
+
+    { name: "BBQ Wings 6 pcs", cat: "wings", price: 649, desc: "Classic BBQ glazed wings with ranch dipping sauce.", badge: "", img: "https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=400&q=75", discount: 0 },
+
+    { name: "Volcano Shake", cat: "drinks", price: 349, desc: "Thick milkshake in Chocolate, Strawberry, or Mango Chili. Served ice-cold.", badge: "New", img: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=400&q=75", discount: 0 },
+
+    { name: "Fresh Lemonade", cat: "drinks", price: 199, desc: "Squeezed-fresh lemonade with mint & pink salt. Ultimate refresher.", badge: "", img: "https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?w=400&q=75", discount: 0 },
+
+    { name: "Blaze Sundae", cat: "dessert", price: 279, desc: "Soft-serve vanilla ice cream drizzled with our hot caramel Blaze sauce.", badge: "Sweet 🍦", img: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=400&q=75", discount: 0 },
+
+    { name: "Molten Brownie", cat: "dessert", price: 319, desc: "Warm chocolate brownie with a gooey centre, served with vanilla ice cream.", badge: "🍫", img: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=400&q=75", discount: 0 }
+
+  ];
+
+
+
+  // ============ LOAD ITEMS FROM BACKEND ============
+
+  async function loadItemsFromBackend() {
+
+    console.log("🔄 Loading items from backend...");
+
+    
+
+    try {
+
+      const res = await fetch('http://localhost:3000/api/items', {
+
+        credentials: 'include'  // ✅ SESSION ADDED
+
+      });
+
+      if (!res.ok) throw new Error('Backend not responding');
+
+      const items = await res.json();
+
+      
+
+      console.log("✅ Items received from backend:", items.length);
+
+      
+
+      if (items && items.length > 0) {
+
+        menuItems = items.map(item => ({
+
+          name: item.name,
+
+          cat: item.category || 'burger',
+
+          price: `Rs. ${item.price}`,
+
+          desc: item.description || 'Delicious flame-grilled item',
+
+          badge: item.badge || '',
+
+          img: item.image || 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&q=75',
+
+          _id: item._id,
+
+          discount: item.discount || 0,
+
+          originalPrice: item.price
+
+        }));
+
+        console.log("📋 Menu items loaded from backend:", menuItems.length);
+
+      } else {
+
+        console.log("⚠️ Backend returned empty, using hardcoded items");
+
+        useHardcodedItems();
+
+      }
+
+    } catch (err) {
+
+      console.error('❌ Backend error, using hardcoded items:', err.message);
+
+      useHardcodedItems();
+
+    }
+
+    
+
+    renderMenu('all');
+
+    updateOrderSelect();
+
+  }
+
+
+
+  // ============ FALLBACK - HARDCODED ITEMS ============
+
+  function useHardcodedItems() {
+
+    menuItems = hardcodedItems.map(item => ({
+
+      name: item.name,
+
+      cat: item.cat,
+
+      price: `Rs. ${item.price}`,
+
+      desc: item.desc,
+
+      badge: item.badge,
+
+      img: item.img,
+
+      discount: item.discount,
+
+      originalPrice: item.price
+
+    }));
+
+    console.log("📋 Using hardcoded items:", menuItems.length);
+
+  }
+
+
+
+  // ============ UPDATE ORDER SELECT DROPDOWN ============
+
+  function updateOrderSelect() {
+
+    const select = document.querySelector('#page-order select');
+
+    if (select) {
+
+      select.innerHTML = menuItems.map(item => 
+
+        `<option>${item.name} — ${item.price}</option>`
+
+      ).join('');
+
+    }
+
+  }
+
+
+
+  // ============ RENDER MENU ============
+
+  function renderMenu(filter = 'all') {
+
+    const grid = document.getElementById('menuGrid');
+
+    if (!grid) {
+
+      console.error("❌ menuGrid element not found!");
+
+      return;
+
+    }
+
+    
+
+    const items = filter === 'all' ? menuItems : menuItems.filter(i => i.cat === filter);
+
+    
+
+    console.log("🎨 Rendering menu - Items:", items.length, "Filter:", filter);
+
+    
+
+    if (items.length === 0) {
+
+      grid.innerHTML = '<p style="text-align:center; padding:2rem; color:#888;">No items available. Add some from admin panel!</p>';
+
+      return;
+
+    }
+
+    
+
+    grid.innerHTML = items.map(item => {
+
+      const finalPrice = item.originalPrice - (item.originalPrice * (item.discount || 0) / 100);
+
+      const displayPrice = item.discount ? `Rs. ${finalPrice} <span style="font-size:12px; text-decoration:line-through; color:#888;">${item.price}</span>` : item.price;
+
+      
+
+      return `
+
+      <div class="menu-card">
+
+        <div class="menu-card-img">
+
+          <img src="${item.img}" alt="${item.name}" loading="lazy" onerror="this.src='https://placehold.co/400x200?text=Blaze+Bites'"/>
+
+          ${item.badge ? `<span class="badge">${item.badge}</span>` : ''}
+
+          ${item.discount ? `<span class="badge" style="background:#ff0000;">${item.discount}% OFF</span>` : ''}
+
+        </div>
+
+        <div class="menu-card-body">
+
+          <h3>${item.name}</h3>
+
+          <p>${item.desc || 'Delicious flame-grilled item'}</p>
+
+          <div class="menu-card-footer">
+
+            <span class="price">${displayPrice}</span>
+
+            <button class="add-btn" onclick="addToCart('${item.name.replace(/'/g, "\\'")}')">+ Add</button>
+
+          </div>
+
+        </div>
+
+      </div>`;
+
+    }).join('');
+
+    
+
+    console.log("✅ Menu rendered successfully");
+
+  }
+
+
+
+  // ============ FILTER MENU ============
+
+  function filterMenu(cat, btn) {
+
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+    btn.classList.add('active');
+
+    renderMenu(cat);
+
+  }
+
+
+
+  // ============ PAGE NAVIGATION ============
+
+function showPage(id) {
+
+  console.log("showPage called with:", id);
+
+  
+
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+
+  const targetPage = document.getElementById('page-' + id);
+
+  if (targetPage) targetPage.classList.add('active');
+
+  
+
+  document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
+
+  const navBtn = document.getElementById('nav-' + id);
+
+  if (navBtn) navBtn.classList.add('active');
+
+  
+
+  window.scrollTo({ top: 0 });
+
+  
+
+  if (id === 'menu') {
+
+    renderMenu();
+
+  }
+
+  
+
+  if (id === 'order') {
+
+    console.log("🟢 Order page opening - loading cart...");
+
+    // ⚡ YE SETTIMEOUT ADD KARO ⚡
+
+    setTimeout(function() {
+
+      loadCartToOrderPage();
+
+      updateOrderSummary();
+
+    }, 200);
+
+  }
+
+}
+
+
+
+  // ============ SEARCH ============
+
+  function getSearchData() {
+
+    const pages = [
+
+      { label: "Home Page", sub: "BlazeBites main page", page: "home" },
+
+      { label: "Our Menu", sub: "Browse all food items", page: "menu" },
+
+      { label: "About Us", sub: "Our story & team", page: "about" },
+
+      { label: "Order Now", sub: "Place a delivery order", page: "order" },
+
+      { label: "Contact", sub: "Get in touch with us", page: "contact" }
+
+    ];
+
+    const menuSearch = menuItems.map(i => ({ label: i.name, sub: `${i.price} — ${i.cat}`, page: "menu" }));
+
+    return [...pages, ...menuSearch];
+
+  }
+
+
+
+  function handleSearch() {
+
+    const q = document.getElementById('searchInput').value.trim().toLowerCase();
+
+    const panel = document.getElementById('searchResults');
+
+    const list = document.getElementById('searchList');
+
+    if (!q) { closeSearch(); return; }
+
+    const searchData = getSearchData();
+
+    const results = searchData.filter(d => d.label.toLowerCase().includes(q) || d.sub.toLowerCase().includes(q));
+
+    if (results.length === 0) {
+
+      list.innerHTML = '<div class="no-result">😕 No results found for "<strong>' + q + '</strong>"</div>';
+
+    } else {
+
+      list.innerHTML = results.slice(0, 10).map(r =>
+
+        `<div class="search-result-item" onclick="showPage('${r.page}');document.getElementById('searchInput').value=''">
+
+          <span class="r-icon">${r.page === 'menu' ? '🍔' : r.page === 'order' ? '🛒' : r.page === 'about' ? '🔥' : r.page === 'contact' ? '📞' : '🏠'}</span>
+
+          <div><strong>${r.label}</strong><small>${r.sub}</small></div>
+
+         </div>`
+
+      ).join('');
+
+    }
+
+    panel.style.display = 'block';
+
+  }
+
+
+
+  function closeSearch() {
+
+    document.getElementById('searchResults').style.display = 'none';
+
+    document.getElementById('searchInput').value = '';
+
+  }
+
+
+
+  // ============ SCROLL BUTTONS ============
+
+  function scrollUp() { window.scrollBy({ top: -window.innerHeight * 0.8, behavior: 'smooth' }); }
+
+  function scrollDown() { window.scrollBy({ top: window.innerHeight * 0.8, behavior: 'smooth' }); }
+
+
+
+  // ============ TOAST ============
+
+  function showToast(msg) {
+
+    const t = document.getElementById('toast');
+
+    t.textContent = msg;
+
+    t.classList.add('show');
+
+    setTimeout(() => t.classList.remove('show'), 2800);
+
+  }
+
+
+
+  // ============ ADD TO CART ============
+
+  function addToCart(name) {
+
+    const item = menuItems.find(i => i.name === name);
+
+    if (!item) {
+
+      console.error("❌ Item not found:", name);
+
+      return;
+
+    }
+
+    const existing = cart.find(i => i.name === name);
+
+    if (existing) {
+
+      existing.qty += 1;
+
+    } else {
+
+      const finalPrice = item.originalPrice - (item.originalPrice * (item.discount || 0) / 100);
+
+      cart.push({
+
+        name: item.name,
+
+        price: finalPrice,
+
+        originalPrice: item.originalPrice,
+
+        qty: 1
+
+      });
+
+    }
+
+    updateOrderSummary();
+
+    showToast('✅ ' + name + ' added!');
+
+  }
+
+
+
+  // ============ PLACE ORDER ============
+
+  function placeOrder() {
+
+    const name = document.querySelector('#page-order input[placeholder="e.g. Ali Khan"]')?.value;
+
+    const phone = document.querySelector('#page-order input[placeholder="0300-1234567"]')?.value;
+
+    const address = document.querySelector('#page-order input[placeholder="Street, Area, City…"]')?.value;
+
+    const itemSelect = document.querySelector('#page-order select');
+
+    const item = itemSelect ? itemSelect.value : '';
+
+    const qtyInput = document.querySelector('#page-order input[type="number"]');
+
+    const qty = qtyInput ? qtyInput.value : 1;
+
+
+
+    if (!name || !phone || !address) {
+
+      alert("Please fill all fields!");
+
+      return;
+
+    }
+
+
+
+    fetch("http://localhost:3000/api/orders", {
+
+      method: "POST",
+
+      headers: { "Content-Type": "application/json" },
+
+      credentials: 'include',  // ✅ SESSION ADDED
+
+      body: JSON.stringify({ name, phone, address, item, qty: parseInt(qty) || 1 })
+
+    })
+
+      .then(res => res.json())
+
+      .then(data => {
+
+        if (data.success) {
+
+          document.getElementById("receiptPopup").style.display = "flex";
+
+          cart = [];
+
+          updateOrderSummary();
+
+          showToast("🔥 Order placed successfully!");
+
+        } else {
+
+          alert("Order failed: " + data.message);
+
+        }
+
+      })
+
+      .catch(err => {
+
+        console.error(err);
+
+        alert("Server error! Make sure backend is running on port 3000");
+
+      });
+
+  }
+
+
+
+  // ============ SEND MESSAGE ============
+
+  function sendMsg() { showToast('📨 Message sent! We\'ll reply soon.'); }
+
+
+
+  // ============ UPDATE ORDER SUMMARY ============
+
+  function updateOrderSummary() {
+
+    const container = document.querySelector(".order-summary");
+
+    if (!container) return;
+
+    
+
+    let html = `<h3>Order Summary</h3>`;
+
+    let total = 0;
+
+    cart.forEach(item => {
+
+      let itemTotal = item.price * item.qty;
+
+      total += itemTotal;
+
+      html += `<div class="summary-item"><span>${item.name} ×${item.qty}</span><span style="color:var(--gold)">Rs. ${itemTotal}</span></div>`;
+
+    });
+
+    let delivery = cart.length > 0 ? 99 : 0;
+
+    let discount = Math.round(total * 0.05);
+
+    let finalTotal = total + delivery - discount;
+
+    html += `<div class="summary-item"><span>Delivery Fee</span><span style="color:var(--gold)">Rs. ${delivery}</span></div>
+
+             <div class="summary-item"><span>Discount (5%)</span><span style="color:#4caf50">- Rs. ${discount}</span></div>
+
+             <div class="summary-total"><span>Total Payable</span><span class="total-price">Rs. ${finalTotal}</span></div>`;
+
+    container.innerHTML = html;
+
+  }
+
+
+
+  // ============ CLOSE RECEIPT ============
+
+  function closeReceipt() { document.getElementById("receiptPopup").style.display = "none"; }
+
+
+
+  // ============ CLOSE SEARCH ON OUTSIDE CLICK ============
+
+  document.addEventListener('click', e => {
+
+    if (!e.target.closest('#searchResults') && !e.target.closest('.search-wrap')) closeSearch();
+
+  });
+
+
+
+  // ============ CHECK SESSION (NAYA FUNCTION) ============
+
+  async function checkSession() {
+
+    try {
+
+      const response = await fetch('http://localhost:3000/api/check-session', {
+
+        credentials: 'include'  // ✅ Cookie automatically send hogi
+
+      });
+
+      const data = await response.json();
+
+      
+
+      console.log("🔍 Session Status:", data);
+
+      
+
+      if (data.loggedIn) {
+
+        console.log("✅ User logged in:", data.user.username);
+
+        localStorage.setItem("loggedIn", "true");
+
+        document.getElementById("loginPage").style.display = "none";
+
+        showToast("👋 Welcome back, " + data.user.username + "!");
+
+        loadItemsFromBackend();
+
+      } else {
+
+        console.log("❌ User not logged in");
+
+        localStorage.removeItem("loggedIn");
+
+      }
+
+    } catch (err) {
+
+      console.error("❌ Session check error:", err);
+
+    }
+
+  }
+
+
+
+  // ============ WINDOW ONLOAD (SESSION CHECK ADDED) ============
+
+  window.onload = function() {
+
+    // ✅ Pehle session check karo
+
+    checkSession();
+
+    
+
+    if (localStorage.getItem("loggedIn") === "true") {
+
+      document.getElementById("loginPage").style.display = "none";
+
+    }
+
+    
+
+    useHardcodedItems();
+
+    renderMenu('all');
+
+    updateOrderSelect();
+
+    loadItemsFromBackend();
+
+  };
+
+
+
+  // ============ LOGIN USER (SESSION CREATE) ============
+
+  function loginUser() {
+
+    const username = document.getElementById("username").value;
+
+    const password = document.getElementById("password").value;
+
+    
+
+    if (username === "" || password === "") {
+
+      document.getElementById("loginError").innerText = "Please enter username and password!";
+
+      return;
+
+    }
+
+    
+
+    // ✅ Backend se session create karne ke liye
+
+    fetch("http://localhost:3000/api/admin/login", {
+
+      method: "POST",
+
+      headers: { "Content-Type": "application/json" },
+
+      credentials: 'include',  // ✅ SESSION ADDED
+
+      body: JSON.stringify({ username, password })
+
+    })
+
+    .then(res => res.json())
+
+    .then(data => {
+
+      if (data.success) {
+
+        localStorage.setItem("loggedIn", "true");
+
+        document.getElementById("loginPage").style.display = "none";
+
+        showToast("🔥 Login Successful");
+
+        loadItemsFromBackend();
+
+      } else {
+
+        document.getElementById("loginError").innerText = "Invalid Username or Password!";
+
+      }
+
+    })
+
+    .catch(err => {
+
+      console.error("Login error:", err);
+
+      document.getElementById("loginError").innerText = "Server error!";
+
+    });
+
+  }
+
+
+
+  // ============ LOGOUT USER (SESSION DESTROY) ============
+
+  function logoutUser() {
+
+    fetch("http://localhost:3000/api/admin/logout", {
+
+      method: "POST",
+
+      credentials: 'include'  // ✅ SESSION ADDED
+
+    })
+
+    .then(res => res.json())
+
+    .then(data => {
+
+      if (data.success) {
+
+        localStorage.removeItem("loggedIn");
+
+        showToast("👋 Logged out successfully!");
+
+        setTimeout(() => location.reload(), 1000);
+
+      }
+
+    })
+
+    .catch(err => {
+
+      console.error("Logout error:", err);
+
+      localStorage.removeItem("loggedIn");
+
+      location.reload();
+
+    });
+
+  }
+
+</script>
+</body>
+</html>
